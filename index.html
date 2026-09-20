@@ -3,52 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Peppa Pig English Quiz & Teacher Dashboard</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Google Fonts: Comfortaa -->
-  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Peppa Pig English Quiz Portal</title>
   
-  <!-- Firebase SDK (Compat Version for Easy Browser Integration) -->
+  <!-- Tailwind CSS & FontAwesome CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDK (Compat Mode for Browsers) -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
     body {
-      font-family: 'Comfortaa', cursive, system-ui, -apple-system, sans-serif;
+      font-family: 'Fredoka', 'Segoe UI', sans-serif;
       background-color: #f0fdf4;
-    }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background-color: #fbcfe8;
-      border-radius: 10px;
     }
   </style>
 </head>
-<body class="bg-sky-100 min-h-screen text-slate-800 pb-12 selection:bg-pink-200">
+<body class="bg-sky-100 min-h-screen text-slate-800 pb-12">
 
-  <!-- Header Navigation -->
-  <header class="bg-pink-400 text-white shadow-lg sticky top-0 z-50">
-    <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-      <div class="flex items-center space-x-3 cursor-pointer" onclick="showSection('student-view')">
-        <div class="bg-white text-pink-500 w-11 h-11 rounded-full flex items-center justify-center font-bold text-2xl shadow-md border-2 border-yellow-300">
+  <!-- Header / Navigation -->
+  <header class="bg-pink-400 text-white p-4 shadow-lg sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white text-pink-500 w-12 h-12 rounded-full flex items-center justify-center font-bold text-2xl shadow">
           🐷
         </div>
         <div>
-          <h1 class="text-xl font-extrabold tracking-wide drop-shadow-sm">Peppa's English Quiz</h1>
-          <p class="text-xs text-pink-100 font-semibold">Fun Learning Portal for Kids</p>
+          <h1 class="text-xl md:text-2xl font-bold tracking-wide">Peppa Pig English Portal</h1>
+          <p class="text-xs text-pink-100">Fun English Learning & Quiz</p>
         </div>
       </div>
       <div class="flex space-x-2">
-        <button onclick="showSection('student-view')" class="bg-sky-300 hover:bg-sky-400 text-sky-900 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition shadow-sm border-2 border-white flex items-center gap-2">
-          <i class="fa-solid fa-graduation-cap"></i> Student Portal
+        <button onclick="showSection('student-view')" class="bg-sky-300 hover:bg-sky-400 text-sky-900 px-4 py-2 rounded-full text-sm font-bold transition shadow">
+          <i class="fa-solid fa-graduation-cap mr-1"></i> Student
         </button>
-        <button onclick="promptTeacherAccess()" class="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition shadow-sm border-2 border-white flex items-center gap-2">
-          <i class="fa-solid fa-chalkboard-user"></i> Teacher Dashboard
+        <button onclick="showSection('teacher-view')" class="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full text-sm font-bold transition shadow">
+          <i class="fa-solid fa-chalkboard-user mr-1"></i> Teacher
         </button>
       </div>
     </div>
@@ -56,498 +48,367 @@
 
   <main class="max-w-4xl mx-auto mt-6 px-4">
 
-    <!-- ================= STUDENT VIEW ================= -->
-    <section id="student-view" class="block space-y-6">
+    <!-- STUDENT PORTAL SECTION -->
+    <section id="student-view" class="block">
       
-      <!-- Student Identity Card -->
-      <div id="student-card" class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border-4 border-pink-200">
-        <div class="flex items-center gap-3 mb-4">
-          <span class="text-3xl">🎈</span>
-          <div>
-            <h2 class="text-2xl font-bold text-pink-500">Welcome to the English Test!</h2>
-            <p class="text-xs text-slate-500">Please fill in your details before starting the exam.</p>
-          </div>
-        </div>
-
+      <!-- Student Information Form -->
+      <div id="student-form-card" class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-pink-200 mb-6">
+        <h2 class="text-2xl md:text-3xl font-bold text-pink-500 mb-2 flex items-center gap-2">
+          <span>🎈</span> Welcome Little Learner!
+        </h2>
+        <p class="text-slate-500 mb-6 text-sm">Please fill in your details before starting the English examination.</p>
+        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Student Name <span class="text-red-500">*</span></label>
-            <input type="text" id="student-name" placeholder="Type your full name..." class="w-full p-3 bg-sky-50 border-2 border-sky-200 rounded-2xl focus:outline-none focus:border-pink-400 font-bold text-slate-700">
+            <label class="block text-sm font-bold text-slate-600 mb-1">Full Name:</label>
+            <input type="text" id="student-name" placeholder="Enter your full name..." class="w-full p-3 border-2 border-sky-200 rounded-2xl focus:outline-none focus:border-pink-400 font-medium">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-600 mb-1">Date</label>
-            <input type="date" id="student-date" class="w-full p-3 bg-sky-50 border-2 border-sky-200 rounded-2xl focus:outline-none focus:border-pink-400 font-bold text-slate-700">
+            <label class="block text-sm font-bold text-slate-600 mb-1">Date:</label>
+            <input type="date" id="student-date" class="w-full p-3 border-2 border-sky-200 rounded-2xl focus:outline-none focus:border-pink-400 font-medium">
           </div>
         </div>
 
-        <button onclick="startQuiz()" class="w-full bg-emerald-400 hover:bg-emerald-500 text-white font-extrabold py-4 rounded-2xl shadow-lg hover:shadow-xl transition text-lg flex items-center justify-center gap-2 border-b-4 border-emerald-600">
-          <span>Start Quiz Now</span> <i class="fa-solid fa-rocket"></i>
+        <button onclick="startExam()" class="w-full bg-emerald-400 hover:bg-emerald-500 text-white font-bold py-4 rounded-2xl shadow-lg transition text-xl flex items-center justify-center gap-2">
+          <span>Start English Quiz</span> 🚀
         </button>
       </div>
 
       <!-- Quiz Questions Container -->
       <div id="quiz-container" class="hidden space-y-6">
-        
-        <!-- Timer Header -->
-        <div class="bg-yellow-200 border-4 border-yellow-300 p-4 rounded-2xl flex justify-between items-center font-bold text-yellow-900 shadow-sm sticky top-20 z-40">
-          <div class="flex items-center gap-2">
-            <i class="fa-solid fa-user-gear text-pink-500"></i>
-            <span>Student: <span id="display-student-name" class="text-pink-600"></span></span>
-          </div>
-          <div class="flex items-center gap-2 text-red-600 font-extrabold bg-white px-3 py-1 rounded-xl shadow-inner">
-            <i class="fa-solid fa-clock"></i>
-            <span id="timer-display">20:00</span>
-          </div>
+        <div class="bg-yellow-100 border-2 border-yellow-300 p-4 rounded-2xl flex justify-between items-center font-bold text-yellow-900 shadow-sm">
+          <span>Student: <span id="display-student-name" class="text-pink-600"></span></span>
+          <span class="bg-white px-3 py-1 rounded-full text-red-500 border border-yellow-300"><i class="fa-regular fa-clock mr-1"></i> <span id="timer">15:00</span></span>
         </div>
 
-        <!-- Questions Form -->
+        <!-- 20 QUESTIONS FORM -->
         <form id="quiz-form" class="space-y-6">
-          
-          <!-- SECTION 1: MULTIPLE CHOICE QUESTIONS -->
-          <div class="bg-sky-200 text-sky-900 px-6 py-3 rounded-2xl font-extrabold flex items-center gap-2">
-            <i class="fa-solid fa-list-check"></i> Part 1: Multiple Choice Questions (10 Questions)
+
+          <!-- Section Header: Multiple Choice -->
+          <div class="bg-sky-500 text-white p-4 rounded-2xl font-bold text-lg shadow-sm">
+            Part A: Multiple Choice Questions (1 - 10)
           </div>
 
           <!-- Q1 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">1</span> What color is Peppa Pig's dress?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q1" value="Red" class="mr-2 accent-pink-500"> A) Red
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q1" value="Blue" class="mr-2 accent-pink-500"> B) Blue
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q1" value="Yellow" class="mr-2 accent-pink-500"> C) Yellow
-              </label>
+            <p class="font-bold text-sky-900 mb-3">1. What color is Peppa Pig's favorite dress?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q1" value="Red" class="mr-3"> A) Red</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q1" value="Blue" class="mr-3"> B) Blue</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q1" value="Yellow" class="mr-3"> C) Yellow</label>
             </div>
           </div>
 
           <!-- Q2 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">2</span> What is George's favorite toy?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q2" value="Teddy" class="mr-2 accent-pink-500"> A) Teddy
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q2" value="Dinosaur" class="mr-2 accent-pink-500"> B) Dinosaur
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q2" value="Car" class="mr-2 accent-pink-500"> C) Car
-              </label>
+            <p class="font-bold text-sky-900 mb-3">2. What animal is George?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q2" value="Pig" class="mr-3"> A) Pig</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q2" value="Dinosaur" class="mr-3"> B) Dinosaur</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q2" value="Rabbit" class="mr-3"> C) Rabbit</label>
             </div>
           </div>
 
           <!-- Q3 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">3</span> What does Peppa love to do in the rain?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q3" value="Jump in muddy puddles" class="mr-2 accent-pink-500"> A) Jump in muddy puddles
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q3" value="Fly a kite" class="mr-2 accent-pink-500"> B) Fly a kite
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q3" value="Sleep" class="mr-2 accent-pink-500"> C) Sleep
-              </label>
+            <p class="font-bold text-sky-900 mb-3">3. What is George's favorite toy?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q3" value="Dinosaur" class="mr-3"> A) Dinosaur</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q3" value="Teddy Bear" class="mr-3"> B) Teddy Bear</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q3" value="Car" class="mr-3"> C) Car</label>
             </div>
           </div>
 
           <!-- Q4 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">4</span> Who is Peppa's best friend?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q4" value="Suzy Sheep" class="mr-2 accent-pink-500"> A) Suzy Sheep
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q4" value="Rebecca Rabbit" class="mr-2 accent-pink-500"> B) Rebecca Rabbit
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q4" value="Danny Dog" class="mr-2 accent-pink-500"> C) Danny Dog
-              </label>
+            <p class="font-bold text-sky-900 mb-3">4. What does Daddy Pig like to do?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q4" value="Read newspapers and eat cookies" class="mr-3"> A) Read newspapers and eat cookies</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q4" value="Fly a spaceship" class="mr-3"> B) Fly a spaceship</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q4" value="Climb trees" class="mr-3"> C) Climb trees</label>
             </div>
           </div>
 
           <!-- Q5 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">5</span> What instrument does Daddy Pig play?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q5" value="Accordion" class="mr-2 accent-pink-500"> A) Accordion
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q5" value="Piano" class="mr-2 accent-pink-500"> B) Piano
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q5" value="Drums" class="mr-2 accent-pink-500"> C) Drums
-              </label>
+            <p class="font-bold text-sky-900 mb-3">5. Who is Peppa's best friend?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q5" value="Suzy Sheep" class="mr-3"> A) Suzy Sheep</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q5" value="Rebecca Rabbit" class="mr-3"> B) Rebecca Rabbit</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q5" value="Danny Dog" class="mr-3"> C) Danny Dog</label>
             </div>
           </div>
 
           <!-- Q6 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">6</span> What vehicle does Grandpa Pig own?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q6" value="Boat" class="mr-2 accent-pink-500"> A) Boat
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q6" value="Airplane" class="mr-2 accent-pink-500"> B) Airplane
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q6" value="Train" class="mr-2 accent-pink-500"> C) Train
-              </label>
+            <p class="font-bold text-sky-900 mb-3">6. What sound does a pig make in English?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q6" value="Oink" class="mr-3"> A) Oink</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q6" value="Woof" class="mr-3"> B) Woof</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q6" value="Meow" class="mr-3"> C) Meow</label>
             </div>
           </div>
 
           <!-- Q7 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">7</span> What color is Mummy Pig's dress?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q7" value="Orange" class="mr-2 accent-pink-500"> A) Orange
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q7" value="Green" class="mr-2 accent-pink-500"> B) Green
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q7" value="Purple" class="mr-2 accent-pink-500"> C) Purple
-              </label>
+            <p class="font-bold text-sky-900 mb-3">7. What color is Mummy Pig's dress?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q7" value="Orange" class="mr-3"> A) Orange</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q7" value="Green" class="mr-3"> B) Green</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q7" value="Purple" class="mr-3"> C) Purple</label>
             </div>
           </div>
 
           <!-- Q8 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">8</span> Where does Madame Gazelle teach?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q8" value="Playgroup" class="mr-2 accent-pink-500"> A) Playgroup
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q8" value="High School" class="mr-2 accent-pink-500"> B) High School
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q8" value="University" class="mr-2 accent-pink-500"> C) University
-              </label>
+            <p class="font-bold text-sky-900 mb-3">8. What do rabbits love to eat?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q8" value="Carrots" class="mr-3"> A) Carrots</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q8" value="Bananas" class="mr-3"> B) Bananas</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q8" value="Fish" class="mr-3"> C) Fish</label>
             </div>
           </div>
 
           <!-- Q9 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">9</span> What sound does a pig make in English?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q9" value="Oink" class="mr-2 accent-pink-500"> A) Oink
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q9" value="Woof" class="mr-2 accent-pink-500"> B) Woof
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q9" value="Meow" class="mr-2 accent-pink-500"> C) Meow
-              </label>
+            <p class="font-bold text-sky-900 mb-3">9. What footwear do you wear to jump in muddy puddles?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q9" value="Boots" class="mr-3"> A) Boots</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q9" value="Slippers" class="mr-3"> B) Slippers</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q9" value="Sandals" class="mr-3"> C) Sandals</label>
             </div>
           </div>
 
           <!-- Q10 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
-            <p class="font-bold text-slate-800 mb-3"><span class="bg-pink-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">10</span> What food does Pedro Pony love to eat at picnics?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q10" value="Sandwiches" class="mr-2 accent-pink-500"> A) Sandwiches
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q10" value="Pizza" class="mr-2 accent-pink-500"> B) Pizza
-              </label>
-              <label class="flex items-center p-3 border-2 border-sky-100 rounded-2xl hover:bg-sky-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q10" value="Carrots" class="mr-2 accent-pink-500"> C) Carrots
-              </label>
+            <p class="font-bold text-sky-900 mb-3">10. Where does Grandpa Pig keep his train?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q10" value="In his shed" class="mr-3"> A) In his shed</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q10" value="In the kitchen" class="mr-3"> B) In the kitchen</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-sky-50 cursor-pointer transition"><input type="radio" name="q10" value="Under his bed" class="mr-3"> C) Under his bed</label>
             </div>
           </div>
 
-          <!-- SECTION 2: LISTENING COMPREHENSION -->
-          <div class="bg-pink-200 text-pink-900 px-6 py-3 rounded-2xl font-extrabold flex items-center gap-2 mt-8">
-            <i class="fa-solid fa-headphones"></i> Part 2: Listening Comprehension (10 Questions)
+          <!-- Section Header: Listening Comprehension -->
+          <div class="bg-pink-500 text-white p-4 rounded-2xl font-bold text-lg shadow-sm">
+            Part B: Listening Comprehension (11 - 20)
           </div>
 
           <!-- Q11 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">11</span> Listening 1:</p>
-              <button type="button" onclick="speakText('Hello, my name is Peppa Pig and this is my little brother George.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">11. Listening Audio:</p>
+              <button type="button" onclick="speakText('Peppa Pig loves jumping in muddy puddles!')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">Listen to the audio clip above and answer: Who is George?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q11" value="Little brother" class="mr-2 accent-pink-500"> A) Little brother
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q11" value="Big cousin" class="mr-2 accent-pink-500"> B) Big cousin
-              </label>
+            <p class="text-sm text-slate-500 mb-3">What does Peppa love doing?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q11" value="Jumping in muddy puddles" class="mr-3"> A) Jumping in muddy puddles</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q11" value="Sleeping all day" class="mr-3"> B) Sleeping all day</label>
             </div>
           </div>
 
           <!-- Q12 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">12</span> Listening 2:</p>
-              <button type="button" onclick="speakText('George loves playing with his toy dinosaur. Grrr!')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">12. Listening Audio:</p>
+              <button type="button" onclick="speakText('George loves his toy dinosaur so much!')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">What sound does George make with his toy?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q12" value="Grrr!" class="mr-2 accent-pink-500"> A) Grrr!
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q12" value="Roar!" class="mr-2 accent-pink-500"> B) Roar!
-              </label>
+            <p class="text-sm text-slate-500 mb-3">Which toy was mentioned?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q12" value="Dinosaur" class="mr-3"> A) Dinosaur</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q12" value="Robot" class="mr-3"> B) Robot</label>
             </div>
           </div>
 
           <!-- Q13 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">13</span> Listening 3:</p>
-              <button type="button" onclick="speakText('If you jump in muddy puddles, you must wear your boots!')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">13. Listening Audio:</p>
+              <button type="button" onclick="speakText('Mummy Pig is working on her computer.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">What must you wear before jumping in muddy puddles?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q13" value="Boots" class="mr-2 accent-pink-500"> A) Boots
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q13" value="Slippers" class="mr-2 accent-pink-500"> B) Slippers
-              </label>
+            <p class="text-sm text-slate-500 mb-3">Where is Mummy Pig working?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q13" value="On her computer" class="mr-3"> A) On her computer</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q13" value="In the garden" class="mr-3"> B) In the garden</label>
             </div>
           </div>
 
           <!-- Q14 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">14</span> Listening 4:</p>
-              <button type="button" onclick="speakText('Daddy Pig lost his glasses in the garden under the big tree.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">14. Listening Audio:</p>
+              <button type="button" onclick="speakText('Daddy Pig lost his spectacles again!')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">Where did Daddy Pig lose his glasses?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q14" value="Under the big tree" class="mr-2 accent-pink-500"> A) Under the big tree
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q14" value="Inside the car" class="mr-2 accent-pink-500"> B) Inside the car
-              </label>
+            <p class="text-sm text-slate-500 mb-3">What did Daddy Pig lose?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q14" value="His spectacles" class="mr-3"> A) His spectacles</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q14" value="His keys" class="mr-3"> B) His keys</label>
             </div>
           </div>
 
           <!-- Q15 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">15</span> Listening 5:</p>
-              <button type="button" onclick="speakText('Mummy Pig is working on her computer in the living room.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">15. Listening Audio:</p>
+              <button type="button" onclick="speakText('Grandpa Pig has a big vegetable garden.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">What is Mummy Pig using?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q15" value="Computer" class="mr-2 accent-pink-500"> A) Computer
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q15" value="Telephone" class="mr-2 accent-pink-500"> B) Telephone
-              </label>
+            <p class="text-sm text-slate-500 mb-3">What kind of garden does Grandpa Pig have?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q15" value="Vegetable garden" class="mr-3"> A) Vegetable garden</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q15" value="Flower garden" class="mr-3"> B) Flower garden</label>
             </div>
           </div>
 
           <!-- Q16 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">16</span> Listening 6:</p>
-              <button type="button" onclick="speakText('Grandpa Pig grows delicious red tomatoes in his greenhouse.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">16. Listening Audio:</p>
+              <button type="button" onclick="speakText('Granny Pig makes delicious chocolate cakes!')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">What vegetable or fruit does Grandpa Pig grow?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q16" value="Tomatoes" class="mr-2 accent-pink-500"> A) Tomatoes
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q16" value="Apples" class="mr-2 accent-pink-500"> B) Apples
-              </label>
+            <p class="text-sm text-slate-500 mb-3">What does Granny Pig make?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q16" value="Chocolate cakes" class="mr-3"> A) Chocolate cakes</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q16" value="Apple pies" class="mr-3"> B) Apple pies</label>
             </div>
           </div>
 
           <!-- Q17 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">17</span> Listening 7:</p>
-              <button type="button" onclick="speakText('Granny Pig makes lovely chocolate cakes for teatime.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">17. Listening Audio:</p>
+              <button type="button" onclick="speakText('Pedro Pony is sleeping during playgroup.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">What kind of cake does Granny Pig bake?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q17" value="Chocolate cake" class="mr-2 accent-pink-500"> A) Chocolate cake
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q17" value="Vanilla cake" class="mr-2 accent-pink-500"> B) Vanilla cake
-              </label>
+            <p class="text-sm text-slate-500 mb-3">Who is sleeping during playgroup?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q17" value="Pedro Pony" class="mr-3"> A) Pedro Pony</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q17" value="Danny Dog" class="mr-3"> B) Danny Dog</label>
             </div>
           </div>
 
           <!-- Q18 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">18</span> Listening 8:</p>
-              <button type="button" onclick="speakText('Suzy Sheep loves dressing up as a nurse.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">18. Listening Audio:</p>
+              <button type="button" onclick="speakText('Madame Gazelle teaches music class.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">What costume does Suzy Sheep love wearing?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q18" value="Nurse" class="mr-2 accent-pink-500"> A) Nurse
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q18" value="Teacher" class="mr-2 accent-pink-500"> B) Teacher
-              </label>
+            <p class="text-sm text-slate-500 mb-3">What subject does Madame Gazelle teach?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q18" value="Music class" class="mr-3"> A) Music class</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q18" value="Art class" class="mr-3"> B) Art class</label>
             </div>
           </div>
 
           <!-- Q19 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">19</span> Listening 9:</p>
-              <button type="button" onclick="speakText('Miss Rabbit drives the big red bus to the zoo.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">19. Listening Audio:</p>
+              <button type="button" onclick="speakText('Miss Rabbit drives the red bus.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">Where is Miss Rabbit driving the bus to?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q19" value="The zoo" class="mr-2 accent-pink-500"> A) The zoo
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q19" value="The beach" class="mr-2 accent-pink-500"> B) The beach
-              </label>
+            <p class="text-sm text-slate-500 mb-3">What vehicle does Miss Rabbit drive?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q19" value="The red bus" class="mr-3"> A) The red bus</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q19" value="The yellow taxi" class="mr-3"> B) The yellow taxi</label>
             </div>
           </div>
 
           <!-- Q20 -->
           <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
             <div class="flex items-center justify-between mb-3">
-              <p class="font-bold text-slate-800"><span class="bg-sky-400 text-white px-2.5 py-1 rounded-xl text-xs mr-2">20</span> Listening 10:</p>
-              <button type="button" onclick="speakText('Peppa and George go to sleep at eight o clock every night.')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-2 rounded-full text-xs font-bold transition flex items-center gap-1 shadow-sm">
-                🔊 Play Audio
+              <p class="font-bold text-pink-900">20. Listening Audio:</p>
+              <button type="button" onclick="speakText('Everyone laughs and falls on the floor!')" class="bg-pink-400 hover:bg-pink-500 text-white px-4 py-1.5 rounded-full text-sm font-bold shadow transition flex items-center gap-2">
+                🔊 Listen
               </button>
             </div>
-            <p class="text-xs text-slate-500 mb-3">At what time do Peppa and George go to sleep?</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q20" value="8:00 PM" class="mr-2 accent-pink-500"> A) 8:00 PM
-              </label>
-              <label class="flex items-center p-3 border-2 border-pink-50 rounded-2xl hover:bg-pink-50 cursor-pointer font-medium text-sm">
-                <input type="radio" name="q20" value="9:00 PM" class="mr-2 accent-pink-500"> B) 9:00 PM
-              </label>
+            <p class="text-sm text-slate-500 mb-3">What does everyone do at the end?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q20" value="Laughs and falls on the floor" class="mr-3"> A) Laughs and falls on the floor</label>
+              <label class="flex items-center p-3 border rounded-2xl hover:bg-pink-50 cursor-pointer transition"><input type="radio" name="q20" value="Goes home quietly" class="mr-3"> B) Goes home quietly</label>
             </div>
           </div>
 
-          <!-- Submit Button -->
-          <button type="button" onclick="submitQuiz()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-extrabold py-5 rounded-2xl shadow-xl transition text-xl flex items-center justify-center gap-2 border-b-4 border-pink-700">
-            <i class="fa-solid fa-paper-plane"></i> Submit Exam
+          <button type="button" onclick="submitQuiz()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 rounded-2xl shadow-xl transition text-2xl flex items-center justify-center gap-2">
+            <span>Submit Exam Answers</span> 🌟
           </button>
         </form>
       </div>
 
-      <!-- Result Score Display & Breakdown -->
-      <div id="result-box" class="hidden bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-yellow-300 space-y-6">
-        <div>
-          <h2 class="text-3xl font-extrabold text-yellow-600 mb-1">🎉 Quiz Completed!</h2>
-          <p class="text-sm text-slate-500">Your score has been recorded and synchronized with your teacher.</p>
+      <!-- Result Score Display -->
+      <div id="result-box" class="hidden bg-white p-8 rounded-3xl shadow-2xl text-center border-4 border-yellow-300">
+        <h2 class="text-3xl font-bold text-yellow-600 mb-2">🎉 Exam Completed!</h2>
+        <p class="text-slate-600 mb-6 text-sm">Your results have been automatically uploaded to the teacher server.</p>
+        
+        <div class="inline-block bg-sky-50 border-4 border-sky-200 rounded-3xl p-6 mb-6 shadow-inner">
+          <span class="block text-sm font-bold text-sky-700 uppercase tracking-widest">FINAL SCORE</span>
+          <span id="score-display" class="text-6xl font-extrabold text-pink-500">0 / 100</span>
         </div>
 
-        <div class="inline-block bg-sky-50 border-4 border-sky-200 rounded-3xl p-6 shadow-inner">
-          <span class="block text-xs font-bold text-sky-700 tracking-wider">FINAL SCORE</span>
-          <span id="score-display" class="text-6xl font-black text-pink-500">0 / 100</span>
-          <p id="time-taken" class="text-xs text-slate-400 mt-2 font-bold"></p>
-        </div>
-
-        <!-- Answers Breakdown -->
-        <div class="text-left bg-slate-50 p-4 rounded-2xl border max-h-60 overflow-y-auto custom-scrollbar">
-          <h3 class="font-bold text-slate-700 mb-2 text-sm"><i class="fa-solid fa-square-poll-vertical"></i> Answer Breakdown:</h3>
-          <div id="breakdown-list" class="space-y-1 text-xs"></div>
-        </div>
-
-        <div>
-          <button onclick="location.reload()" class="bg-sky-400 hover:bg-sky-500 text-white font-bold px-8 py-3 rounded-2xl shadow-md transition">
-            Take Quiz Again 🔄
+        <div class="flex justify-center gap-4">
+          <button onclick="location.reload()" class="bg-sky-400 hover:bg-sky-500 text-white font-bold px-6 py-3 rounded-full shadow transition">
+            Try Again 🔄
           </button>
         </div>
       </div>
-
     </section>
 
-    <!-- ================= TEACHER DASHBOARD VIEW ================= -->
-    <section id="teacher-view" class="hidden space-y-6">
-      
-      <!-- Live Monitoring Card -->
-      <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-yellow-200">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <!-- TEACHER DASHBOARD SECTION -->
+    <section id="teacher-view" class="hidden">
+      <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border-4 border-yellow-200">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
-            <h2 class="text-2xl font-extrabold text-yellow-600 flex items-center gap-2">
-              <i class="fa-solid fa-chart-line"></i> Live Student Dashboard
+            <h2 class="text-2xl font-bold text-yellow-600 flex items-center gap-2">
+              <span>📊</span> Teacher Live Monitor
             </h2>
-            <p class="text-xs text-slate-500">Realtime student scores synchronized via Firebase Cloud Database.</p>
+            <p class="text-xs text-slate-500">Student submissions sync in real-time across all countries.</p>
           </div>
-          <span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-3 py-1 rounded-full text-xs font-bold self-start sm:self-auto flex items-center gap-1.5 animate-pulse">
-            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Sync Connected
+          <span class="bg-emerald-100 text-emerald-800 border border-emerald-300 px-4 py-1.5 rounded-full text-xs font-bold animate-pulse flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Realtime Connected
           </span>
         </div>
 
-        <!-- Filter / Search -->
-        <div class="mb-4">
-          <input type="text" id="search-student" onkeyup="filterResults()" placeholder="🔍 Search student name..." class="w-full p-3 bg-yellow-50 border-2 border-yellow-200 rounded-xl text-sm font-semibold focus:outline-none focus:border-yellow-400">
-        </div>
-
-        <!-- Realtime Table -->
-        <div class="overflow-x-auto rounded-2xl border border-yellow-100">
-          <table class="w-full text-left border-collapse text-sm">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-yellow-200 text-yellow-900 font-extrabold">
+              <tr class="bg-yellow-100 text-yellow-900 border-b-2 border-yellow-200 text-sm">
                 <th class="p-3">Date</th>
                 <th class="p-3">Student Name</th>
+                <th class="p-3">Exam Title</th>
                 <th class="p-3">Score</th>
-                <th class="p-3">Time Taken</th>
                 <th class="p-3">Status</th>
               </tr>
             </thead>
-            <tbody id="student-results-body" class="divide-y divide-yellow-100">
+            <tbody id="student-results-body" class="text-sm">
               <tr>
-                <td colspan="5" class="p-4 text-center text-slate-400 font-semibold">Connecting to cloud database...</td>
+                <td colspan="5" class="p-4 text-center text-slate-400">Loading real-time results from server...</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
-
     </section>
 
   </main>
 
-  <!-- JavaScript Logic & Firebase Sync -->
+  <!-- JavaScript Logics & Firebase Integration -->
   <script>
-    // 1. FIREBASE CONFIGURATION
+    // 1. FIREBASE CONFIGURATION (Linked directly to your Firebase Project)
     const firebaseConfig = {
       apiKey: "AIzaSyAV7PA-3WS4mQ8TfzW37N-pgt7vi032wbU",
       authDomain: "peppa-pig-6fe6b.firebaseapp.com",
@@ -562,127 +423,89 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Default Date Setup
+    // Default Date Picker to Today
     document.getElementById('student-date').valueAsDate = new Date();
 
-    // Answer Keys
-    const answerKeys = {
-      q1: "Red",
-      q2: "Dinosaur",
-      q3: "Jump in muddy puddles",
-      q4: "Suzy Sheep",
-      q5: "Accordion",
-      q6: "Boat",
-      q7: "Orange",
-      q8: "Playgroup",
-      q9: "Oink",
-      q10: "Sandwiches",
-      q11: "Little brother",
-      q12: "Grrr!",
-      q13: "Boots",
-      q14: "Under the big tree",
-      q15: "Computer",
-      q16: "Tomatoes",
-      q17: "Chocolate cake",
-      q18: "Nurse",
-      q19: "The zoo",
-      q20: "8:00 PM"
-    };
-
-    let timerInterval;
-    let secondsLeft = 1200; // 20 Minutes
-    let timeStarted = 0;
-
-    // View Navigation
+    // Switch Navigation Sections
     function showSection(sectionId) {
       document.getElementById('student-view').classList.add('hidden');
       document.getElementById('teacher-view').classList.add('hidden');
       document.getElementById(sectionId).classList.remove('hidden');
     }
 
-    // Teacher Pin Access
-    function promptTeacherAccess() {
-      const pin = prompt("Enter Teacher PIN (Default: 1234):");
-      if (pin === "1234" || pin === "") {
-        showSection('teacher-view');
-      } else {
-        alert("Incorrect PIN!");
-      }
-    }
-
-    // Text-To-Speech Player
+    // Audio Player for Listening Comprehension Questions
     function speakText(text) {
       if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // Stop ongoing speech
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'en-US';
-        utterance.rate = 0.9;
-        window.speechSynthesis.speak(utterance);
+        speechSynthesis.speak(utterance);
       } else {
-        alert("Audio speech synthesis is not supported on this device/browser.");
+        alert('Browser speech engine is not supported on this device.');
       }
     }
 
-    // Start Quiz Function
-    function startQuiz() {
-      const name = document.getElementById('student-name').value.trim();
-      if (!name) {
-        alert('Please enter your name before starting!');
-        return;
-      }
-      document.getElementById('display-student-name').innerText = name;
-      document.getElementById('student-card').classList.add('hidden');
-      document.getElementById('quiz-container').classList.remove('hidden');
-      timeStarted = Date.now();
-
-      // Start Timer
+    // Timer Logic
+    let timerInterval;
+    function startTimer(durationInSeconds) {
+      let timer = durationInSeconds;
+      const display = document.getElementById('timer');
       timerInterval = setInterval(() => {
-        secondsLeft--;
-        const mins = Math.floor(secondsLeft / 60);
-        const secs = secondsLeft % 60;
-        document.getElementById('timer-display').innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-        
-        if (secondsLeft <= 0) {
+        let minutes = parseInt(timer / 60, 10);
+        let seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+
+        display.textContent = minutes + ":" + seconds;
+
+        if (--timer < 0) {
           clearInterval(timerInterval);
-          alert("Time is up! Submitting your answers automatically.");
+          alert('Time is up! Your answers are being submitted automatically.');
           submitQuiz();
         }
       }, 1000);
     }
 
+    // Start Exam Action
+    function startExam() {
+      const name = document.getElementById('student-name').value.trim();
+      if (!name) {
+        alert('Please enter your full name to start the quiz!');
+        return;
+      }
+      document.getElementById('display-student-name').innerText = name;
+      document.getElementById('student-form-card').classList.add('hidden');
+      document.getElementById('quiz-container').classList.remove('hidden');
+      
+      // Start 15-minute exam countdown
+      startTimer(15 * 60);
+    }
+
     // Submit Quiz & Push Realtime Data to Firebase
     function submitQuiz() {
       clearInterval(timerInterval);
-      const name = document.getElementById('student-name').value.trim();
+      
+      const name = document.getElementById('student-name').value.trim() || 'Anonymous Student';
       const date = document.getElementById('student-date').value;
 
-      const timeSpentSecs = Math.round((Date.now() - timeStarted) / 1000);
-      const minsSpent = Math.floor(timeSpentSecs / 60);
-      const secsSpent = timeSpentSecs % 60;
-      const formattedTimeSpent = `${minsSpent}m ${secsSpent}s`;
+      // Answer Keys for 20 Questions
+      const keys = {
+        q1: 'Red', q2: 'Pig', q3: 'Dinosaur', q4: 'Read newspapers and eat cookies', q5: 'Suzy Sheep',
+        q6: 'Oink', q7: 'Orange', q8: 'Carrots', q9: 'Boots', q10: 'In his shed',
+        q11: 'Jumping in muddy puddles', q12: 'Dinosaur', q13: 'On her computer', q14: 'His spectacles', q15: 'Vegetable garden',
+        q16: 'Chocolate cakes', q17: 'Pedro Pony', q18: 'Music class', q19: 'The red bus', q20: 'Laughs and falls on the floor'
+      };
+
+      let correctCount = 0;
+      const totalQuestions = 20;
 
       const form = document.getElementById('quiz-form');
       const formData = new FormData(form);
 
-      let correctCount = 0;
-      const totalQuestions = 20;
-      const breakdownList = document.getElementById('breakdown-list');
-      breakdownList.innerHTML = '';
-
-      for (let i = 1; i <= totalQuestions; i++) {
-        const qKey = `q${i}`;
-        const userAns = formData.get(qKey);
-        const correctAns = answerKeys[qKey];
-        const isCorrect = userAns === correctAns;
-
-        if (isCorrect) correctCount++;
-
-        breakdownList.innerHTML += `
-          <div class="flex justify-between items-center py-1 border-b border-slate-100">
-            <span>Q${i}: ${isCorrect ? '<span class="text-emerald-600 font-bold">✓ Correct</span>' : '<span class="text-red-500 font-bold">✗ Incorrect</span>'}</span>
-            <span class="text-slate-500">Selected: ${userAns || 'None'} ${!isCorrect ? `(Ans: ${correctAns})` : ''}</span>
-          </div>
-        `;
+      for (let [q, correctAns] of Object.entries(keys)) {
+        if (formData.get(q) === correctAns) {
+          correctCount++;
+        }
       }
 
       const finalScore = Math.round((correctCount / totalQuestions) * 100);
@@ -692,20 +515,23 @@
       newScoreRef.set({
         name: name,
         date: date,
+        examTitle: 'Peppa Pig English Exam',
         score: finalScore,
-        timeSpent: formattedTimeSpent,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-      }).catch(err => console.error("Firebase Error: ", err));
+        timestamp: Date.now()
+      }).then(() => {
+        console.log("Score synced to cloud successfully.");
+      }).catch((err) => {
+        console.error("Firebase sync error: ", err);
+      });
 
-      // Display Results View
+      // Display Final Results Screen
       document.getElementById('quiz-container').classList.add('hidden');
-      document.getElementById('score-display').innerText = `${finalScore} / 100`;
-      document.getElementById('time-taken').innerText = `Time spent: ${formattedTimeSpent}`;
+      document.getElementById('score-display').innerText = finalScore + " / 100";
       document.getElementById('result-box').classList.remove('hidden');
     }
 
     // Realtime Listener for Teacher Dashboard
-    function listenRealtimeResults() {
+    function listenForRealtimeScores() {
       const resultsRef = database.ref('quiz_results');
       resultsRef.on('value', (snapshot) => {
         const data = snapshot.val();
@@ -717,33 +543,23 @@
           Object.keys(data).reverse().forEach((key) => {
             const item = data[key];
             tableBody.innerHTML += `
-              <tr class="hover:bg-yellow-50 transition border-b border-yellow-100">
-                <td class="p-3 text-slate-600 font-medium">${item.date || '-'}</td>
+              <tr class="border-b hover:bg-yellow-50 transition">
+                <td class="p-3 text-slate-600">${item.date || '-'}</td>
                 <td class="p-3 font-bold text-slate-800">${item.name}</td>
-                <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold text-xs">${item.score} / 100</span></td>
-                <td class="p-3 text-slate-500 text-xs">${item.timeSpent || '-'}</td>
-                <td class="p-3 text-emerald-600 font-bold text-xs"><i class="fa-solid fa-circle-check"></i> Completed</td>
+                <td class="p-3 text-slate-600">${item.examTitle || 'Peppa Pig Exam'}</td>
+                <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold">${item.score} / 100</span></td>
+                <td class="p-3 text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle"></i> Submitted</td>
               </tr>
             `;
           });
         } else {
-          tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No student submissions found yet.</td></tr>`;
+          tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No student submissions yet.</td></tr>`;
         }
       });
     }
 
-    // Filter Table Results
-    function filterResults() {
-      const query = document.getElementById('search-student').value.toLowerCase();
-      const rows = document.querySelectorAll('#student-results-body tr');
-      rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(query) ? '' : 'none';
-      });
-    }
-
-    // Initialize Listener
-    document.addEventListener('DOMContentLoaded', listenRealtimeResults);
+    // Run realtime listener on startup
+    document.addEventListener('DOMContentLoaded', listenForRealtimeScores);
   </script>
 </body>
 </html>
