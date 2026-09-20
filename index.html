@@ -11,9 +11,9 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     
-    <!-- Firebase SDK (Version 9 Compatibility Mode) -->
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- Firebase SDK (v8 Universal - Sangat Stabil untuk Browser) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <script>
         tailwind.config = {
@@ -108,7 +108,7 @@
                     Ready for your English Quiz?
                 </h2>
                 <p class="text-slate-600 max-w-lg mx-auto text-sm md:text-base mb-6">
-                    Answer 20 interactive questions (10 Reading & 10 Listening). Your score is calculated <strong>automatically</strong> as soon as you finish!
+                    Answer 20 interactive questions. Your score is calculated <strong>automatically</strong> as soon as you finish!
                 </p>
 
                 <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 md:p-6 max-w-md mx-auto text-left space-y-4">
@@ -169,7 +169,7 @@
             </div>
         </div>
 
-        <!-- VIEW RESULT (DENGAN PEMBAHASAN JAWABAN) -->
+        <!-- VIEW RESULT -->
         <div id="view-result" class="hidden space-y-6">
             <div class="bg-white custom-card p-8 text-center relative overflow-hidden">
                 <div id="score-badge" class="inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3">
@@ -215,7 +215,7 @@
                 </div>
             </div>
 
-            <!-- Review Kunci Jawaban Benar & Salah -->
+            <!-- Review Kunci Jawaban -->
             <div class="bg-white custom-card p-6 md:p-8 space-y-6">
                 <h3 class="heading-font text-2xl text-slate-800 font-bold flex items-center">
                     <i class="fa-solid fa-magnifying-glass text-peppaPink mr-2"></i> Question Review & Explanations
@@ -224,11 +224,10 @@
             </div>
         </div>
 
-        <!-- VIEW TEACHER (PERSIS SESUAI TAMPILAN GAMBAR ACCORDING TO SPEC) -->
+        <!-- VIEW TEACHER LIVE MONITOR -->
         <div id="view-teacher" class="hidden space-y-6">
             <div class="bg-white rounded-3xl p-6 md:p-8 border-4 border-yellow-200 shadow-xl relative">
                 
-                <!-- Header Live Monitor -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 mb-4 gap-3">
                     <div>
                         <div class="flex items-center space-x-2">
@@ -239,13 +238,11 @@
                     </div>
                     
                     <div class="flex items-center space-x-2">
-                        <!-- Realtime Connected Badge -->
                         <div class="px-3.5 py-1.5 bg-emerald-50 border border-emerald-300 rounded-full flex items-center space-x-2">
                             <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
                             <span class="text-xs font-bold text-emerald-700">Realtime Connected</span>
                         </div>
                         
-                        <!-- Reset Button for Teacher -->
                         <button onclick="resetTeacherData()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-full border border-rose-200 transition flex items-center space-x-1">
                             <i class="fa-solid fa-rotate-right"></i>
                             <span>Reset Data</span>
@@ -253,7 +250,6 @@
                     </div>
                 </div>
 
-                <!-- Table Container -->
                 <div class="overflow-x-auto rounded-xl border border-amber-200">
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -281,23 +277,23 @@
     </div>
 
     <script>
-       // Konfigurasi dari Firebase Console Kamu
-const firebaseConfig = {
-    apiKey: "AIzaSyAV7PA-3WS4mQ8Tfzw37N-pgt7vi032wbU",
-    authDomain: "peppa-pig-6fe6b.firebaseapp.com",
-    databaseURL: "https://peppa-pig-6fe6b-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "peppa-pig-6fe6b",
-    storageBucket: "peppa-pig-6fe6b.firebasestorage.app",
-    messagingSenderId: "429651367123",
-    appId: "1:429651367123:web:eab91c738a04100169b026",
-    measurementId: "G-670DTEFGHZ"
-};
-
-// Inisialisasi Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const database = firebase.database();
+        // 1. Konfigurasi Firebase dari Console
+        const firebaseConfig = {
+            apiKey: "AIzaSyAV7PA-3WS4mQ8Tfzw37N-pgt7vi032wbU",
+            authDomain: "peppa-pig-6fe6b.firebaseapp.com",
+            databaseURL: "https://peppa-pig-6fe6b-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "peppa-pig-6fe6b",
+            storageBucket: "peppa-pig-6fe6b.firebasestorage.app",
+            messagingSenderId: "429651367123",
+            appId: "1:429651367123:web:eab91c738a04100169b026",
+            measurementId: "G-670DTEFGHZ"
+        };
+        
+        // Inisialisasi Firebase v8
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const database = firebase.database();
 
         // 2. Database Soal
         const quizQuestions = [
@@ -697,7 +693,7 @@ const database = firebase.database();
             calculateAndShowScore();
         }
 
-        // Kalkulasi Skor Otomatis
+        // Kalkulasi Skor & Kirim ke Database
         function calculateAndShowScore() {
             clearInterval(timerInterval);
 
@@ -724,36 +720,31 @@ const database = firebase.database();
             document.getElementById('stat-wrong').innerText = wrongCount;
             document.getElementById('stat-time').innerText = durationStr;
 
-            const badge = document.getElementById('score-badge');
-            if (scorePercentage >= 80) {
-                badge.className = "inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3 bg-emerald-100 text-emerald-700 border border-emerald-300";
-                badge.innerText = "🌟 Excellent Work!";
-            } else if (scorePercentage >= 60) {
-                badge.className = "inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3 bg-amber-100 text-amber-700 border border-amber-300";
-                badge.innerText = "👍 Good Job!";
-            } else {
-                badge.className = "inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3 bg-rose-100 text-rose-700 border border-rose-300";
-                badge.innerText = "💪 Keep Practicing";
-            }
-
-            // Kirim Hasil ke Firebase Realtime Database
             const now = new Date();
             const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
             
-            database.ref('submissions').push({
+            const payload = {
                 studentName: currentStudent.name,
                 examTitle: "Peppa Pig English Quiz",
                 score: scorePercentage,
                 status: "Completed",
                 date: dateStr,
                 timestamp: firebase.database.ServerValue.TIMESTAMP
+            };
+
+            database.ref('submissions').push(payload, (error) => {
+                if (error) {
+                    console.error("Gagal menyimpan ke Firebase:", error);
+                    alertModal("Gagal mengirim hasil ke server. Pastikan Firebase Rules diset ke 'true'.");
+                } else {
+                    console.log("Data berhasil terkirim ke Firebase!");
+                }
             });
 
             renderReviewBreakdown();
             switchView('result');
         }
 
-        // Render Penjelasan Jawaban Benar & Salah
         function renderReviewBreakdown() {
             const container = document.getElementById('review-container');
             container.innerHTML = '';
@@ -791,113 +782,59 @@ const database = firebase.database();
             });
         }
 
-    
-       // 1. Fungsi Menghitung Skor & Mengirim Data ke Firebase
-function calculateAndShowScore() {
-    clearInterval(timerInterval);
+        // Sinkronisasi Realtime Firebase ke Dashboard Guru
+        function listenToRealtimeScores() {
+            const tbody = document.getElementById('teacher-score-tbody');
+            
+            database.ref('submissions').on('value', (snapshot) => {
+                tbody.innerHTML = '';
+                
+                if (!snapshot.exists()) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-slate-400 font-semibold">
+                                Belum ada data kuis yang masuk. Coba tes kerjakan kuis sebagai murid terlebih dahulu!
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
 
-    let correctCount = 0;
-    quizQuestions.forEach(q => {
-        if (userAnswers[q.id] === q.answer) {
-            correctCount++;
-        }
-    });
+                const list = [];
+                snapshot.forEach((child) => {
+                    list.unshift({ key: child.key, ...child.val() });
+                });
 
-    const total = quizQuestions.length;
-    const scorePercentage = Math.round((correctCount / total) * 100);
-    const wrongCount = total - correctCount;
+                list.forEach((item) => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-amber-50/50 transition border-b border-amber-100";
 
-    const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-    const secs = String(timerSeconds % 60).padStart(2, '0');
-    const durationStr = `${mins}:${secs}`;
-
-    document.getElementById('result-student-info').innerText = `${currentStudent.name} • ${currentStudent.grade}`;
-    document.getElementById('final-score-val').innerText = scorePercentage;
-    document.getElementById('final-score-percentage').innerText = `${correctCount} out of ${total} Correct (${scorePercentage}%)`;
-
-    document.getElementById('stat-correct').innerText = correctCount;
-    document.getElementById('stat-wrong').innerText = wrongCount;
-    document.getElementById('stat-time').innerText = durationStr;
-
-    // Format Tanggal
-    const now = new Date();
-    const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
-    
-    const payload = {
-        studentName: currentStudent.name,
-        examTitle: "Peppa Pig English Quiz",
-        score: scorePercentage,
-        status: "Completed",
-        date: dateStr,
-        timestamp: firebase.database.ServerValue.TIMESTAMP
-    };
-
-    // Kirim ke Firebase dengan callback penanganan error
-    database.ref('submissions').push(payload, (error) => {
-        if (error) {
-            console.error("Gagal menyimpan ke Firebase:", error);
-            alertModal("Gagal mengirim hasil ke server. Pastikan Firebase Rules diset ke 'true'.");
-        } else {
-            console.log("Data berhasil terkirim ke Firebase!");
-        }
-    });
-
-    renderReviewBreakdown();
-    switchView('result');
-}
-
-// 2. Fungsi Sinkronisasi Realtime untuk Dashboard Guru (Bagian di foto Anda)
-function listenToRealtimeScores() {
-    const tbody = document.getElementById('teacher-score-tbody');
-    
-    database.ref('submissions').on('value', (snapshot) => {
-        tbody.innerHTML = '';
-        
-        if (!snapshot.exists()) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="p-8 text-center text-slate-400 font-semibold">
-                        Belum ada data kuis yang masuk dari murid.
-                    </td>
-                </tr>
-            `;
-            return;
+                    tr.innerHTML = `
+                        <td class="p-3.5 text-slate-600">${item.date || '-'}</td>
+                        <td class="p-3.5 font-bold text-slate-800">${item.studentName || 'Anonim'}</td>
+                        <td class="p-3.5 text-slate-600">${item.examTitle || 'Peppa Pig English Quiz'}</td>
+                        <td class="p-3.5 font-bold text-peppaPink">${item.score}%</td>
+                        <td class="p-3.5">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                                ${item.status || 'Completed'}
+                            </span>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }, (error) => {
+                console.error("Firebase Read Error:", error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="p-8 text-center text-rose-500 font-bold">
+                            Akses ditolak. Pastikan Rules di Firebase Console di-set ke read: true dan write: true.
+                        </td>
+                    </tr>
+                `;
+            });
         }
 
-        const list = [];
-        snapshot.forEach((child) => {
-            list.unshift({ key: child.key, ...child.val() });
-        });
-
-        list.forEach((item) => {
-            const tr = document.createElement('tr');
-            tr.className = "hover:bg-amber-50/50 transition border-b border-amber-100";
-
-            tr.innerHTML = `
-                <td class="p-3.5 text-slate-600">${item.date || '-'}</td>
-                <td class="p-3.5 font-bold text-slate-800">${item.studentName || 'Anonim'}</td>
-                <td class="p-3.5 text-slate-600">${item.examTitle || 'Peppa Pig English Quiz'}</td>
-                <td class="p-3.5 font-bold text-peppaPink">${item.score}%</td>
-                <td class="p-3.5">
-                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
-                        ${item.status || 'Completed'}
-                    </span>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }, (error) => {
-        console.error("Firebase Read Error:", error);
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" class="p-8 text-center text-rose-500 font-bold">
-                    Akses ditolak oleh Firebase. Silakan periksa tab Rules di Firebase Console.
-                </td>
-            </tr>
-        `;
-    });
-}
-        // Tombol Reset Data untuk Teacher
+        // Reset Data Server
         function resetTeacherData() {
             if (confirm("Are you sure you want to clear all student submissions from the server?")) {
                 database.ref('submissions').remove()
