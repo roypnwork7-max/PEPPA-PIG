@@ -281,15 +281,23 @@
     </div>
 
     <script>
-        // 1. Inisialisasi Firebase Realtime Database
-        const firebaseConfig = {
-            databaseURL: "https://peppa-pig-6fe6b-default-rtdb.firebaseio.com"
-        };
-        
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        const database = firebase.database();
+       // Konfigurasi dari Firebase Console Kamu
+const firebaseConfig = {
+    apiKey: "AIzaSyAV7PA-3WS4mQ8Tfzw37N-pgt7vi032wbU",
+    authDomain: "peppa-pig-6fe6b.firebaseapp.com",
+    databaseURL: "https://peppa-pig-6fe6b-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "peppa-pig-6fe6b",
+    storageBucket: "peppa-pig-6fe6b.firebasestorage.app",
+    messagingSenderId: "429651367123",
+    appId: "1:429651367123:web:eab91c738a04100169b026",
+    measurementId: "G-670DTEFGHZ"
+};
+
+// Inisialisasi Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const database = firebase.database();
 
         // 2. Database Soal
         const quizQuestions = [
