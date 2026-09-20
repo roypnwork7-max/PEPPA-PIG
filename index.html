@@ -1,838 +1,300 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Peppa Pig English Quiz & Learning Portal</title>
-    
-    <!-- Tailwind CSS Engine -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome Icons (Loaded via JSDelivr for reliable global CDN access including China) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        peppaPink: '#FF758F',
-                        peppaSoftPink: '#FFB3C1',
-                        peppaBgPink: '#FFF0F3',
-                        peppaBlue: '#3A86FF',
-                        peppaSky: '#8ECAE6',
-                        peppaYellow: '#FFB703',
-                        peppaGreen: '#52B788',
-                    },
-                    fontFamily: {
-                        // System-native rounded & friendly font fallback stack (Guarantees fast loading without Google Fonts dependencies in China)
-                        fredoka: ['ui-rounded', 'Comfortaa', 'Fredoka', 'Comic Sans MS', 'Arial Rounded MT Bold', 'sans-serif'],
-                        nunito: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <style>
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: linear-gradient(135deg, #E0F2FE 0%, #FFF0F3 50%, #F0FDF4 100%);
-            min-height: 100vh;
-        }
-        .heading-font {
-            font-family: 'ui-rounded', 'Comfortaa', 'Arial Rounded MT Bold', 'Fredoka', sans-serif;
-        }
-        .bubble-btn {
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-        .bubble-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 20px -5px rgba(255, 117, 143, 0.4);
-        }
-        .bubble-btn:active {
-            transform: translateY(1px) scale(0.98);
-        }
-        .custom-card {
-            border-radius: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-            border: 3px solid #FFFFFF;
-        }
-        .pulse-audio {
-            animation: pulse-ring 1.5s infinite;
-        }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(58, 134, 255, 0.7); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 12px rgba(58, 134, 255, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(58, 134, 255, 0); }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Peppa Pig English Quiz Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase SDK (Compat Mode for Browser) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0fdf4;
+    }
+  </style>
 </head>
-<body class="text-slate-800 pb-12 select-none">
+<body class="bg-sky-100 min-h-screen text-slate-800 pb-12">
 
-    <nav class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b-4 border-peppaSoftPink px-4 py-3">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('welcome')">
-                <div class="w-11 h-11 bg-peppaPink text-white rounded-2xl flex items-center justify-center font-bold text-2xl shadow-md border-2 border-white">
-                    🐷
-                </div>
-                <div>
-                    <h1 class="heading-font text-2xl text-peppaPink font-bold leading-none">Peppa English</h1>
-                    <span class="text-xs text-slate-500 font-semibold tracking-wide">AUTOMATED QUIZ PORTAL</span>
-                </div>
-            </div>
-            <div class="flex items-center space-x-2">
-                <button onclick="switchView('welcome')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
-                    <i class="fa-solid fa-house mr-1"></i> Student
-                </button>
-                <button onclick="switchView('teacher')" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-peppaBlue text-white hover:bg-blue-600 transition shadow-md">
-                    <i class="fa-solid fa-chalkboard-user mr-1"></i> Teacher Dashboard
-                </button>
-            </div>
+  <!-- Header / Navigation -->
+  <header class="bg-pink-400 text-white p-4 shadow-md sticky top-0 z-50">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white text-pink-500 w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shadow">
+          🐷
         </div>
-    </nav>
-
-    <div class="max-w-4xl mx-auto px-4 mt-6">
-
-        <div id="view-welcome" class="space-y-6">
-            <div class="bg-white custom-card p-6 md:p-8 text-center relative overflow-hidden">
-                <div class="absolute -right-10 -bottom-10 opacity-10 text-9xl select-none">🐷</div>
-                <span class="bg-peppaBgPink text-peppaPink font-bold text-xs uppercase px-3.5 py-1.5 rounded-full border border-peppaSoftPink">
-                    ✨ Peppa Pig & Friends English Exam
-                </span>
-                <h2 class="heading-font text-3xl md:text-4xl text-slate-800 font-bold mt-4 mb-2">
-                    Ready for your English Quiz?
-                </h2>
-                <p class="text-slate-600 max-w-lg mx-auto text-sm md:text-base mb-6">
-                    Answer 20 interactive questions (10 Reading & 10 Listening). Your score is calculated <strong>automatically</strong> as soon as you finish!
-                </p>
-
-                <!-- Student Registration Form -->
-                <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 md:p-6 max-w-md mx-auto text-left space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Student Full Name</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-user absolute left-3.5 top-3.5 text-slate-400"></i>
-                            <input type="text" id="student-name" placeholder="e.g. Peppa / Suzy / George" class="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-peppaPink focus:outline-none font-semibold text-slate-800">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Class / Grade</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-school absolute left-3.5 top-3.5 text-slate-400"></i>
-                            <input type="text" id="student-class" placeholder="e.g. Grade 3 A" class="w-full pl-10 pr-4 py-2.5 rounded-xl border-2 border-slate-200 focus:border-peppaPink focus:outline-none font-semibold text-slate-800" value="Grade 3">
-                        </div>
-                    </div>
-                    <button onclick="startQuiz()" class="bubble-btn w-full py-3.5 bg-peppaPink hover:bg-pink-600 text-white font-bold rounded-xl text-lg shadow-lg flex items-center justify-center space-x-2">
-                        <span>Start Test Now</span>
-                        <i class="fa-solid fa-play"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div id="view-quiz" class="hidden space-y-6">
-            <!-- Sticky Quiz Header -->
-            <div class="bg-white custom-card p-4 flex flex-wrap items-center justify-between gap-4 sticky top-16 z-30 shadow-md">
-                <div class="flex items-center space-x-3">
-                    <div class="w-10 h-10 rounded-xl bg-peppaBgPink text-peppaPink flex items-center justify-center font-bold">
-                        <i class="fa-solid fa-user-graduate"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-slate-500 font-bold uppercase">Student</p>
-                        <p id="display-student-name" class="font-bold text-slate-800 leading-tight">Student Name</p>
-                    </div>
-                </div>
-
-                <div class="flex items-center space-x-6">
-                    <div class="text-right">
-                        <p class="text-xs text-slate-500 font-bold uppercase">Progress</p>
-                        <p id="display-progress" class="font-bold text-peppaBlue">0 / 20 Answered</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-xs text-slate-500 font-bold uppercase">Time Elapsed</p>
-                        <p id="display-timer" class="font-mono font-bold text-peppaPink text-lg">00:00</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Questions Container -->
-            <div id="questions-container" class="space-y-6">
-                <!-- Dynamically injected via JavaScript -->
-            </div>
-
-            <!-- Submit Section -->
-            <div class="bg-white custom-card p-6 text-center">
-                <button onclick="confirmAndSubmit()" class="bubble-btn px-8 py-4 bg-peppaGreen hover:bg-emerald-600 text-white font-bold rounded-2xl text-xl shadow-xl flex items-center justify-center space-x-3 mx-auto">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>Submit Exam & Calculate Score</span>
-                </button>
-            </div>
-        </div>
-
-        <div id="view-result" class="hidden space-y-6">
-            <div class="bg-white custom-card p-8 text-center relative overflow-hidden">
-                <div id="score-badge" class="inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3">
-                    Exam Completed
-                </div>
-                <h2 class="heading-font text-3xl md:text-4xl text-slate-800 font-bold mb-1">
-                    Your Test Results
-                </h2>
-                <p id="result-student-info" class="text-slate-500 text-sm font-semibold mb-6"></p>
-
-                <!-- Big Score Highlight Box -->
-                <div class="bg-slate-50 border-2 border-slate-200 rounded-3xl p-6 max-w-sm mx-auto my-4 text-center">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-1">Final Automated Score</span>
-                    <div id="final-score-val" class="heading-font text-6xl md:text-7xl font-bold text-peppaPink">
-                        0
-                    </div>
-                    <div id="final-score-percentage" class="text-sm font-bold text-slate-500 mt-2">
-                        0% Accuracy
-                    </div>
-                </div>
-
-                <!-- Score Stats -->
-                <div class="grid grid-cols-3 gap-3 max-w-md mx-auto my-6">
-                    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-2xl text-center">
-                        <span class="block text-2xl font-bold text-emerald-600" id="stat-correct">0</span>
-                        <span class="text-xs font-bold text-emerald-700">Correct</span>
-                    </div>
-                    <div class="bg-rose-50 border border-rose-200 p-3 rounded-2xl text-center">
-                        <span class="block text-2xl font-bold text-rose-600" id="stat-wrong">0</span>
-                        <span class="text-xs font-bold text-rose-700">Incorrect</span>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-200 p-3 rounded-2xl text-center">
-                        <span class="block text-2xl font-bold text-peppaBlue" id="stat-time">00:00</span>
-                        <span class="text-xs font-bold text-blue-700">Duration</span>
-                    </div>
-                </div>
-
-                <div class="flex justify-center space-x-3">
-                    <button onclick="switchView('welcome')" class="px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition">
-                        <i class="fa-solid fa-rotate-left mr-1"></i> Retake Test
-                    </button>
-                    <button onclick="switchView('teacher')" class="px-6 py-3 bg-peppaBlue hover:bg-blue-600 text-white font-bold rounded-xl text-sm transition shadow-md">
-                        <i class="fa-solid fa-list-check mr-1"></i> Teacher Dashboard
-                    </button>
-                </div>
-            </div>
-
-            <!-- Detailed Item Review -->
-            <div class="bg-white custom-card p-6 md:p-8 space-y-6">
-                <h3 class="heading-font text-2xl text-slate-800 font-bold flex items-center">
-                    <i class="fa-solid fa-magnifying-glass text-peppaPink mr-2"></i> Question Review & Explanations
-                </h3>
-                <div id="review-container" class="space-y-4">
-                    <!-- Populated dynamically -->
-                </div>
-            </div>
-        </div>
-
-        <div id="view-teacher" class="hidden space-y-6">
-            <div class="bg-white custom-card p-6 md:p-8">
-                <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h2 class="heading-font text-3xl text-slate-800 font-bold">Teacher Dashboard</h2>
-                        <p class="text-slate-500 text-sm">Automated score logs and student submission history</p>
-                    </div>
-                    <button onclick="clearAllScores()" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs rounded-xl border border-rose-200 transition">
-                        <i class="fa-solid fa-trash mr-1"></i> Clear Log History
-                    </button>
-                </div>
-
-                <!-- Table Search -->
-                <div class="mb-4">
-                    <input type="text" id="teacher-search" onkeyup="renderTeacherTable()" placeholder="🔍 Search student name..." class="w-full md:w-72 px-4 py-2 rounded-xl border-2 border-slate-200 text-sm focus:border-peppaBlue focus:outline-none">
-                </div>
-
-                <!-- Results Table -->
-                <div class="overflow-x-auto rounded-2xl border-2 border-slate-200">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-100 text-slate-700 font-bold uppercase text-xs">
-                            <tr>
-                                <th class="p-3.5">Student Name</th>
-                                <th class="p-3.5">Class</th>
-                                <th class="p-3.5">Score</th>
-                                <th class="p-3.5">Accuracy</th>
-                                <th class="p-3.5">Time Spent</th>
-                                <th class="p-3.5">Submitted At</th>
-                            </tr>
-                        </thead>
-                        <tbody id="teacher-score-tbody" class="divide-y divide-slate-100 font-semibold text-slate-700">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
+        <h1 class="text-xl font-bold tracking-wide">Peppa Pig English Quiz</h1>
+      </div>
+      <div class="space-x-2">
+        <button onclick="showSection('student-view')" class="bg-sky-300 hover:bg-sky-400 text-sky-900 px-4 py-2 rounded-full text-sm font-semibold transition">
+          Student Portal
+        </button>
+        <button onclick="showSection('teacher-view')" class="bg-yellow-300 hover:bg-yellow-400 text-yellow-900 px-4 py-2 rounded-full text-sm font-semibold transition">
+          Teacher Dashboard
+        </button>
+      </div>
     </div>
+  </header>
 
-    <script>
-        // 20 Questions Database (Reading + Speech Listening)
-        const quizQuestions = [
-            // PART 1: READING & MULTIPLE CHOICE (1 - 10)
-            {
-                id: 1,
-                section: "Multiple Choice",
-                question: "In the Peppa Pig episode 'Best Friend', what does Peppa pretend to do with her magic wand?",
-                options: [
-                    "Bake delicious chocolate cookies for everyone.",
-                    "Wave her magic wand and turn George into a frog.",
-                    "Play hide and seek with Daddy Pig.",
-                    "Invite Suzy Sheep over for afternoon tea."
-                ],
-                answer: 1,
-                explanation: "Peppa says: 'I wave my magic wand and turn you into a frog!'"
-            },
-            {
-                id: 2,
-                section: "Multiple Choice",
-                question: "Why does George feel sad when Suzy Sheep comes to visit?",
-                options: [
-                    "Because there is no ice cream left.",
-                    "Because Peppa and Suzy say they are playing secret games for big girls.",
-                    "Because Mummy Pig is busy on her computer.",
-                    "Because his dinosaur toy fell into the mud."
-                ],
-                answer: 1,
-                explanation: "Peppa and Suzy tell George that they are playing big girls' games and ask him to go away."
-            },
-            {
-                id: 3,
-                section: "Multiple Choice",
-                question: "In 'Mummy Pig at Work', what does Mummy Pig need to do on her computer?",
-                options: [
-                    "Play the 'Happy Mrs. Chicken' game.",
-                    "Watch funny pig videos.",
-                    "Complete her important work for her job.",
-                    "Order groceries online."
-                ],
-                answer: 2,
-                explanation: "Mummy Pig says she has to do important work on her computer."
-            },
-            {
-                id: 4,
-                section: "Multiple Choice",
-                question: "What happens when Peppa touches Mummy Pig's computer keyboard?",
-                options: [
-                    "The screen goes completely dark.",
-                    "The computer makes a strange beep sound and stops working properly.",
-                    "A new game pops up on the screen.",
-                    "The background color changes."
-                ],
-                answer: 1,
-                explanation: "Peppa touches the keyboard and it makes a loud glitch sound."
-            },
-            {
-                id: 5,
-                section: "Multiple Choice",
-                question: "Where does Peppa hide during the game of Hide and Seek?",
-                options: [
-                    "Under the kitchen table.",
-                    "Behind the living room curtains.",
-                    "Under her bed in the bedroom.",
-                    "Under the clothes basket."
-                ],
-                answer: 3,
-                explanation: "Peppa hides inside/under the laundry basket."
-            },
-            {
-                id: 6,
-                section: "Multiple Choice",
-                question: "In 'Daddy Pig's Glasses', where do the children look for his missing glasses?",
-                options: [
-                    "All around the living room, under newspapers, and on the TV.",
-                    "Inside Daddy Pig's car.",
-                    "In the garden near the trees.",
-                    "Inside the kitchen fridge."
-                ],
-                answer: 0,
-                explanation: "They search under newspapers, cushions, and around the TV."
-            },
-            {
-                id: 7,
-                section: "Multiple Choice",
-                question: "Why does everyone laugh when Daddy Pig's glasses are found?",
-                options: [
-                    "Because they were in the garden.",
-                    "Because Daddy Pig was sitting on them the whole time.",
-                    "Because George hid them in his pocket.",
-                    "Because they were painted pink."
-                ],
-                answer: 1,
-                explanation: "Daddy Pig was sitting right on top of his missing glasses."
-            },
-            {
-                id: 8,
-                section: "Multiple Choice",
-                question: "In 'Piggy in the Middle', why does Peppa shout 'That's not fair!'?",
-                options: [
-                    "Because George throws the ball too fast.",
-                    "Because Daddy Pig lifts George up to catch the ball easily.",
-                    "Because Mummy Pig takes the ball away.",
-                    "Because the ball gets dirty."
-                ],
-                answer: 1,
-                explanation: "Peppa complains when Daddy Pig helps George reach high up."
-            },
-            {
-                id: 9,
-                section: "Multiple Choice",
-                question: "Which English phrase is the most natural way to say 'Kami datang ke sini naik mobil'?",
-                options: [
-                    "We came here by driving our vehicle.",
-                    "We drove here.",
-                    "We are on a driving holiday.",
-                    "We travel here without paying money."
-                ],
-                answer: 1,
-                explanation: "'We drove here' is standard native conversational English."
-            },
-            {
-                id: 10,
-                section: "Multiple Choice",
-                question: "Which expression naturally describes feeling very tired after an enjoyable day outside?",
-                options: [
-                    "I'm exhausted from all the fun.",
-                    "I am going to start making my photos.",
-                    "What a lively crowd in the park!",
-                    "We went to a tourist spot."
-                ],
-                answer: 0,
-                explanation: "'I'm exhausted from all the fun' is the idiomatic way to express this."
-            },
+  <main class="max-w-4xl mx-auto mt-6 px-4">
 
-            // PART 2: AUDIO LISTENING (11 - 20)
-            {
-                id: 11,
-                section: "Listening Comprehension",
-                audioText: "Suzy Sheep says: I want to be a nurse! Peppa replies: I want to be a doctor. Suzy asks: But who is going to be the sick person? Peppa shouts: George!",
-                question: "Audio Q1: What job does Suzy Sheep want to play in their doctor game?",
-                options: ["A nurse", "A doctor", "A sick patient", "A dentist"],
-                answer: 0,
-                explanation: "Suzy says: 'I want to be a nurse!'"
-            },
-            {
-                id: 12,
-                section: "Listening Comprehension",
-                audioText: "Suzy Sheep says: I want to be a nurse! Peppa replies: I want to be a doctor. Suzy asks: But who is going to be the sick person? Peppa shouts: George!",
-                question: "Audio Q2: Who is selected to play the role of the sick patient?",
-                options: ["Mummy Pig", "Daddy Pig", "George", "Suzy Sheep"],
-                answer: 2,
-                explanation: "Peppa shouts 'George!' when asking who will be the patient."
-            },
-            {
-                id: 13,
-                section: "Listening Comprehension",
-                audioText: "Peppa asks: Mummy? Can we play that computer game, Happy Mrs. Chicken? Mummy Pig answers: We can play Happy Mrs. Chicken later, Peppa. But right now I have to do important work.",
-                question: "Audio Q3: Which computer game do the children want to play?",
-                options: ["Super Dinosaur", "Happy Mrs. Chicken", "Fairy Princess", "Hide and Seek"],
-                answer: 1,
-                explanation: "Peppa explicitly asks to play 'Happy Mrs. Chicken'."
-            },
-            {
-                id: 14,
-                section: "Listening Comprehension",
-                audioText: "Peppa asks: Mummy? Can we play that computer game, Happy Mrs. Chicken? Mummy Pig answers: We can play Happy Mrs. Chicken later, Peppa. But right now I have to do important work.",
-                question: "Audio Q4: Why can't they play the game immediately?",
-                options: ["Mummy Pig has to do her work first.", "The computer is broken.", "Daddy Pig is using it.", "They need to sleep."],
-                answer: 0,
-                explanation: "Mummy Pig says she must do her important work first."
-            },
-            {
-                id: 15,
-                section: "Listening Comprehension",
-                audioText: "Narrator: Grandpa Pig finds a tiny plant growing in the garden. Day by day, the plant grows bigger. Then one day, Grandpa finds something very special: red juicy strawberries!",
-                question: "Audio Q5: What sweet fruit grows on the plant in Grandpa Pig's garden?",
-                options: ["Apples", "Bananas", "Strawberries", "Grapes"],
-                answer: 2,
-                explanation: "Grandpa finds 'red juicy strawberries'."
-            },
-            {
-                id: 16,
-                section: "Listening Comprehension",
-                audioText: "Narrator: Grandpa Pig finds a tiny plant growing in the garden. Day by day, the plant grows bigger. Then one day, Grandpa finds something very special: red juicy strawberries!",
-                question: "Audio Q6: Who looked after the growing plant in the garden?",
-                options: ["Mummy Pig", "Grandpa Pig", "George", "Suzy Sheep"],
-                answer: 1,
-                explanation: "Grandpa Pig found and nurtured the plant."
-            },
-            {
-                id: 17,
-                section: "Listening Comprehension",
-                audioText: "Speaker A asks: Are there any fun places you would recommend around here? Speaker B answers: Well, this spot is so much fun! But to be honest, I am not used to the local food here yet.",
-                question: "Audio Q7: What is Speaker A asking for?",
-                options: [
-                    "A recommendation for fun places",
-                    "The price of a ticket",
-                    "A taxi ride to the airport",
-                    "The opening hours of the park"
-                ],
-                answer: 0,
-                explanation: "Speaker A asks: 'Are there any fun places you would recommend around here?'"
-            },
-            {
-                id: 18,
-                section: "Listening Comprehension",
-                audioText: "Speaker A asks: Are there any fun places you would recommend around here? Speaker B answers: Well, this spot is so much fun! But to be honest, I am not used to the local food here yet.",
-                question: "Audio Q8: What challenge is Speaker B experiencing?",
-                options: [
-                    "Lack of money",
-                    "Cold weather",
-                    "Not used to the local food yet",
-                    "Lost passport"
-                ],
-                answer: 2,
-                explanation: "Speaker B mentions: 'I am not used to the local food here yet.'"
-            },
-            {
-                id: 19,
-                section: "Listening Comprehension",
-                audioText: "Speaker A says: People here love to join in the fun during holidays. Speaker B replies: Yes, we had a great day out! Now I am about to edit my vacation photos.",
-                question: "Audio Q9: How did Speaker B describe their day outside?",
-                options: [
-                    "We had a great day out!",
-                    "We spent too much time waiting.",
-                    "I want to go home.",
-                    "It was boring."
-                ],
-                answer: 0,
-                explanation: "Speaker B states: 'We had a great day out!'"
-            },
-            {
-                id: 20,
-                section: "Listening Comprehension",
-                audioText: "Speaker A says: People here love to join in the fun during holidays. Speaker B replies: Yes, we had a great day out! Now I am about to edit my vacation photos.",
-                question: "Audio Q10: What is Speaker B planning to do next?",
-                options: [
-                    "Cook dinner",
-                    "Sleep",
-                    "Buy souvenirs",
-                    "Edit their vacation photos"
-                ],
-                answer: 3,
-                explanation: "Speaker B says: 'Now I am about to edit my vacation photos.'"
-            }
-        ];
+    <!-- STUDENT PORTAL SECTION -->
+    <section id="student-view" class="block">
+      <!-- Identity Form -->
+      <div id="student-form-card" class="bg-white rounded-3xl p-6 shadow-xl border-4 border-pink-200 mb-6">
+        <h2 class="text-2xl font-bold text-pink-500 mb-4 flex items-center gap-2">
+          <span>🎈</span> Welcome Little Learner!
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-bold text-slate-600 mb-1">Your Full Name:</label>
+            <input type="text" id="student-name" placeholder="Enter your name..." class="w-full p-3 border-2 border-sky-200 rounded-xl focus:outline-none focus:border-pink-400">
+          </div>
+          <div>
+            <label class="block text-sm font-bold text-slate-600 mb-1">Date:</label>
+            <input type="date" id="student-date" class="w-full p-3 border-2 border-sky-200 rounded-xl focus:outline-none focus:border-pink-400">
+          </div>
+        </div>
+        <button onclick="startExam()" class="w-full bg-emerald-400 hover:bg-emerald-500 text-white font-bold py-3 rounded-2xl shadow-lg transition text-lg">
+          Start Quiz Now! 🚀
+        </button>
+      </div>
 
-        let userAnswers = {};
-        let currentStudent = { name: "", grade: "" };
-        let timerSeconds = 0;
-        let timerInterval = null;
+      <!-- Quiz Questions Container (Hidden initially) -->
+      <div id="quiz-container" class="hidden space-y-6">
+        <div class="bg-yellow-100 border-2 border-yellow-300 p-4 rounded-2xl flex justify-between items-center font-bold text-yellow-800">
+          <span>Student: <span id="display-student-name" class="text-pink-600"></span></span>
+          <span>Time Remaining: <span id="timer" class="text-red-500">15:00</span></span>
+        </div>
 
-        // View Router Function
-        function switchView(viewName) {
-            document.getElementById('view-welcome').classList.add('hidden');
-            document.getElementById('view-quiz').classList.add('hidden');
-            document.getElementById('view-result').classList.add('hidden');
-            document.getElementById('view-teacher').classList.add('hidden');
+        <!-- Questions List -->
+        <form id="quiz-form" class="space-y-6">
+          
+          <!-- Multiple Choice Sample -->
+          <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
+            <p class="font-bold text-sky-800 mb-3">1. What color is Peppa Pig's dress?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-xl hover:bg-sky-50 cursor-pointer">
+                <input type="radio" name="q1" value="Red" class="mr-3"> A) Red
+              </label>
+              <label class="flex items-center p-3 border rounded-xl hover:bg-sky-50 cursor-pointer">
+                <input type="radio" name="q1" value="Blue" class="mr-3"> B) Blue
+              </label>
+              <label class="flex items-center p-3 border rounded-xl hover:bg-sky-50 cursor-pointer">
+                <input type="radio" name="q1" value="Yellow" class="mr-3"> C) Yellow
+              </label>
+            </div>
+          </div>
 
-            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+          <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-sky-100">
+            <p class="font-bold text-sky-800 mb-3">2. What animal is George?</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-xl hover:bg-sky-50 cursor-pointer">
+                <input type="radio" name="q2" value="Pig" class="mr-3"> A) Pig
+              </label>
+              <label class="flex items-center p-3 border rounded-xl hover:bg-sky-50 cursor-pointer">
+                <input type="radio" name="q2" value="Dog" class="mr-3"> B) Dog
+              </label>
+              <label class="flex items-center p-3 border rounded-xl hover:bg-sky-50 cursor-pointer">
+                <input type="radio" name="q2" value="Cat" class="mr-3"> C) Cat
+              </label>
+            </div>
+          </div>
 
-            if (viewName === 'teacher') {
-                renderTeacherTable();
-            }
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+          <!-- Listening Sample -->
+          <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-pink-100">
+            <div class="flex items-center gap-3 mb-3">
+              <p class="font-bold text-pink-800">3. Listening Question:</p>
+              <button type="button" onclick="speakText('Peppa loves jumping in muddy puddles')" class="bg-pink-400 hover:bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                🔊 Play Audio
+              </button>
+            </div>
+            <p class="text-sm text-slate-500 mb-3">Listen to the audio and choose what Peppa loves doing:</p>
+            <div class="space-y-2">
+              <label class="flex items-center p-3 border rounded-xl hover:bg-pink-50 cursor-pointer">
+                <input type="radio" name="q3" value="Jumping in muddy puddles" class="mr-3"> A) Jumping in muddy puddles
+              </label>
+              <label class="flex items-center p-3 border rounded-xl hover:bg-pink-50 cursor-pointer">
+                <input type="radio" name="q3" value="Sleeping all day" class="mr-3"> B) Sleeping all day
+              </label>
+            </div>
+          </div>
+
+          <button type="button" onclick="submitQuiz()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-4 rounded-2xl shadow-lg transition text-xl">
+            Submit My Answers 🌟
+          </button>
+        </form>
+      </div>
+
+      <!-- Result Score Box (Hidden initially) -->
+      <div id="result-box" class="hidden bg-white p-8 rounded-3xl shadow-xl text-center border-4 border-yellow-300">
+        <h2 class="text-3xl font-bold text-yellow-600 mb-2">🎉 Quiz Completed!</h2>
+        <p class="text-slate-600 mb-6">Your results have been sent automatically to your teacher.</p>
+        <div class="inline-block bg-sky-100 border-4 border-sky-300 rounded-3xl p-6 mb-6">
+          <span class="block text-sm font-bold text-sky-700">YOUR SCORE</span>
+          <span id="score-display" class="text-6xl font-extrabold text-pink-500">0 / 100</span>
+        </div>
+        <div>
+          <button onclick="location.reload()" class="bg-sky-400 hover:bg-sky-500 text-white font-bold px-6 py-3 rounded-full">
+            Take Quiz Again 🔄
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEACHER DASHBOARD SECTION -->
+    <section id="teacher-view" class="hidden">
+      <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-yellow-200">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold text-yellow-600 flex items-center gap-2">
+            <span>📊</span> Live Student Results
+          </h2>
+          <span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+            ● Realtime Connected
+          </span>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-yellow-100 text-yellow-900 border-b-2 border-yellow-200">
+                <th class="p-3">Date</th>
+                <th class="p-3">Student Name</th>
+                <th class="p-3">Score</th>
+                <th class="p-3">Status</th>
+              </tr>
+            </thead>
+            <tbody id="student-results-body">
+              <tr>
+                <td colspan="4" class="p-4 text-center text-slate-400">Waiting for student submissions...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JavaScript Integration with Firebase -->
+  <script>
+    // 1. FIREBASE CONFIGURATION (Directly from your screenshot)
+    const firebaseConfig = {
+      apiKey: "AIzaSyAV7PA-3WS4mQ8TfzW37N-pgt7vi032wbU",
+      authDomain: "peppa-pig-6fe6b.firebaseapp.com",
+      projectId: "peppa-pig-6fe6b",
+      storageBucket: "peppa-pig-6fe6b.firebasestorage.app",
+      messagingSenderId: "429651367123",
+      appId: "1:429651367123:web:eab91c738a04100169b026",
+      databaseURL: "https://peppa-pig-6fe6b-default-rtdb.asia-southeast1.firebasedatabase.app" // Regional RTDB URL
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Set today date as default
+    document.getElementById('student-date').valueAsDate = new Date();
+
+    // Section Toggle
+    function showSection(sectionId) {
+      document.getElementById('student-view').classList.add('hidden');
+      document.getElementById('teacher-view').classList.add('hidden');
+      document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    // Audio Player Function (Text-to-Speech)
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+      } else {
+        alert('Browser does not support audio speech.');
+      }
+    }
+
+    // Start Exam Function
+    function startExam() {
+      const name = document.getElementById('student-name').value.trim();
+      if (!name) {
+        alert('Please enter your name first!');
+        return;
+      }
+      document.getElementById('display-student-name').innerText = name;
+      document.getElementById('student-form-card').classList.add('hidden');
+      document.getElementById('quiz-container').classList.remove('hidden');
+    }
+
+    // Submit Quiz & Push to Firebase Realtime Database
+    function submitQuiz() {
+      const name = document.getElementById('student-name').value;
+      const date = document.getElementById('student-date').value;
+
+      // Answers Key
+      const keys = { q1: 'Red', q2: 'Pig', q3: 'Jumping in muddy puddles' };
+      let correctCount = 0;
+      let totalQuestions = 3;
+
+      const form = document.getElementById('quiz-form');
+      const formData = new FormData(form);
+
+      for (let [q, ans] of Object.entries(keys)) {
+        if (formData.get(q) === ans) {
+          correctCount++;
         }
+      }
 
-        // Start Quiz Engine
-        function startQuiz() {
-            const nameInput = document.getElementById('student-name').value.trim();
-            const classInput = document.getElementById('student-class').value.trim();
+      const finalScore = Math.round((correctCount / totalQuestions) * 100);
 
-            if (!nameInput) {
-                alertModal("Please enter your name before starting!");
-                return;
-            }
+      // Save to Firebase Realtime Database
+      const newScoreRef = database.ref('quiz_results').push();
+      newScoreRef.set({
+        name: name,
+        date: date,
+        score: finalScore,
+        timestamp: Date.now()
+      });
 
-            currentStudent.name = nameInput;
-            currentStudent.grade = classInput || "Grade 3";
-            document.getElementById('display-student-name').innerText = `${currentStudent.name} (${currentStudent.grade})`;
+      // Show Result View
+      document.getElementById('quiz-container').classList.add('hidden');
+      document.getElementById('score-display').innerText = finalScore + " / 100";
+      document.getElementById('result-box').classList.remove('hidden');
+    }
 
-            userAnswers = {};
-            timerSeconds = 0;
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                timerSeconds++;
-                const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-                const secs = String(timerSeconds % 60).padStart(2, '0');
-                document.getElementById('display-timer').innerText = `${mins}:${secs}`;
-            }, 1000);
+    // Realtime Listener for Teacher Dashboard
+    function listenForRealtimeScores() {
+      const resultsRef = database.ref('quiz_results');
+      resultsRef.on('value', (snapshot) => {
+        const data = snapshot.val();
+        const tableBody = document.getElementById('student-results-body');
+        if (!tableBody) return;
 
-            renderQuestions();
-            updateProgress();
-            switchView('quiz');
-        }
-
-        // Render Questions Function
-        function renderQuestions() {
-            const container = document.getElementById('questions-container');
-            container.innerHTML = '';
-
-            quizQuestions.forEach((q, index) => {
-                const card = document.createElement('div');
-                card.className = "bg-white custom-card p-6 border-l-8 " + (q.section === "Listening Comprehension" ? "border-l-peppaBlue" : "border-l-peppaPink");
-
-                let audioBtnHtml = '';
-                if (q.section === "Listening Comprehension") {
-                    audioBtnHtml = `
-                        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-4 flex items-center justify-between">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-10 h-10 rounded-full bg-peppaBlue text-white flex items-center justify-center text-lg shadow">
-                                    <i class="fa-solid fa-volume-high"></i>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-bold text-peppaBlue uppercase block">Audio Dialogue</span>
-                                    <span class="text-xs text-slate-500">Tap button to play browser speech engine</span>
-                                </div>
-                            </div>
-                            <button onclick="playTTS('${escapeQuotes(q.audioText)}', this)" type="button" class="bubble-btn px-4 py-2 bg-peppaBlue text-white font-bold rounded-xl text-xs flex items-center space-x-2 shadow">
-                                <i class="fa-solid fa-play"></i>
-                                <span>Play Audio</span>
-                            </button>
-                        </div>
-                    `;
-                }
-
-                let optionsHtml = q.options.map((opt, optIdx) => `
-                    <label class="flex items-start space-x-3 p-3.5 rounded-xl border-2 border-slate-100 hover:border-peppaSoftPink hover:bg-peppaBgPink/40 cursor-pointer transition">
-                        <input type="radio" name="q_${q.id}" value="${optIdx}" onchange="selectAnswer(${q.id}, ${optIdx})" class="mt-1 w-4 h-4 text-peppaPink focus:ring-peppaPink">
-                        <span class="text-slate-700 text-sm font-semibold">${opt}</span>
-                    </label>
-                `).join('');
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between mb-3">
-                        <span class="text-xs font-bold px-3 py-1 rounded-full ${q.section === 'Listening Comprehension' ? 'bg-blue-100 text-peppaBlue' : 'bg-pink-100 text-peppaPink'}">
-                            Question ${index + 1} of 20 (${q.section})
-                        </span>
-                    </div>
-                    ${audioBtnHtml}
-                    <h3 class="font-bold text-slate-800 text-base md:text-lg mb-4">${q.question}</h3>
-                    <div class="space-y-2.5">${optionsHtml}</div>
-                `;
-
-                container.appendChild(card);
-            });
-        }
-
-        function escapeQuotes(str) {
-            return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
-        }
-
-        // Native Browser Text-to-Speech Engine (Zero server load, works inside China GFW)
-        function playTTS(text, btn) {
-            if (!('speechSynthesis' in window)) {
-                alertModal("Text-to-Speech is not supported in this browser.");
-                return;
-            }
-
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.88;
-            utterance.pitch = 1.0;
-            utterance.lang = 'en-US';
-
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Playing...</span>`;
-            btn.classList.add('pulse-audio');
-
-            utterance.onend = () => {
-                btn.innerHTML = originalHtml;
-                btn.classList.remove('pulse-audio');
-            };
-
-            utterance.onerror = () => {
-                btn.innerHTML = originalHtml;
-                btn.classList.remove('pulse-audio');
-            };
-
-            window.speechSynthesis.speak(utterance);
-        }
-
-        function selectAnswer(questionId, optionIndex) {
-            userAnswers[questionId] = optionIndex;
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const answeredCount = Object.keys(userAnswers).length;
-            document.getElementById('display-progress').innerText = `${answeredCount} / 20 Answered`;
-        }
-
-        function confirmAndSubmit() {
-            const answeredCount = Object.keys(userAnswers).length;
-            if (answeredCount < 20) {
-                if (!confirm(`You answered ${answeredCount} out of 20 questions. Do you want to submit now?`)) {
-                    return;
-                }
-            }
-            calculateAndShowScore();
-        }
-
-        // Automated Score Calculation
-        function calculateAndShowScore() {
-            clearInterval(timerInterval);
-
-            let correctCount = 0;
-            quizQuestions.forEach(q => {
-                if (userAnswers[q.id] === q.answer) {
-                    correctCount++;
-                }
-            });
-
-            const total = quizQuestions.length;
-            const scorePercentage = Math.round((correctCount / total) * 100);
-            const wrongCount = total - correctCount;
-
-            const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
-            const secs = String(timerSeconds % 60).padStart(2, '0');
-            const durationStr = `${mins}:${secs}`;
-
-            document.getElementById('result-student-info').innerText = `${currentStudent.name} • ${currentStudent.grade}`;
-            document.getElementById('final-score-val').innerText = scorePercentage;
-            document.getElementById('final-score-percentage').innerText = `${correctCount} out of ${total} Correct (${scorePercentage}%)`;
-
-            document.getElementById('stat-correct').innerText = correctCount;
-            document.getElementById('stat-wrong').innerText = wrongCount;
-            document.getElementById('stat-time').innerText = durationStr;
-
-            const badge = document.getElementById('score-badge');
-            if (scorePercentage >= 80) {
-                badge.className = "inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3 bg-emerald-100 text-emerald-700 border border-emerald-300";
-                badge.innerText = "🌟 Excellent Work!";
-            } else if (scorePercentage >= 60) {
-                badge.className = "inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3 bg-amber-100 text-amber-700 border border-amber-300";
-                badge.innerText = "👍 Good Job!";
-            } else {
-                badge.className = "inline-block px-4 py-1.5 rounded-full font-bold text-xs uppercase mb-3 bg-rose-100 text-rose-700 border border-rose-300";
-                badge.innerText = "💪 Keep Practicing";
-            }
-
-            // Save to local storage database
-            saveResultToTeacherData({
-                name: currentStudent.name,
-                grade: currentStudent.grade,
-                score: scorePercentage,
-                correct: correctCount,
-                total: total,
-                duration: durationStr,
-                timestamp: new Date().toLocaleString()
-            });
-
-            renderReviewBreakdown();
-            switchView('result');
-        }
-
-        function renderReviewBreakdown() {
-            const container = document.getElementById('review-container');
-            container.innerHTML = '';
-
-            quizQuestions.forEach((q, idx) => {
-                const userChoice = userAnswers[q.id];
-                const isCorrect = userChoice === q.answer;
-
-                const card = document.createElement('div');
-                card.className = `p-4 rounded-2xl border-2 ${isCorrect ? 'bg-emerald-50/50 border-emerald-200' : 'bg-rose-50/50 border-rose-200'}`;
-
-                let statusBadge = isCorrect 
-                    ? `<span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 font-bold text-xs rounded-full"><i class="fa-solid fa-check mr-1"></i> Correct</span>`
-                    : `<span class="px-2.5 py-1 bg-rose-100 text-rose-700 font-bold text-xs rounded-full"><i class="fa-solid fa-xmark mr-1"></i> Incorrect</span>`;
-
-                let userAnsText = userChoice !== undefined ? q.options[userChoice] : "<em>No answer given</em>";
-                let correctAnsText = q.options[q.answer];
-
-                card.innerHTML = `
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="font-bold text-xs text-slate-500 uppercase">Question ${idx + 1}</span>
-                        ${statusBadge}
-                    </div>
-                    <p class="font-bold text-slate-800 text-sm mb-2">${q.question}</p>
-                    <div class="text-xs space-y-1 mb-2">
-                        <p class="${isCorrect ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}">Your Answer: ${userAnsText}</p>
-                        ${!isCorrect ? `<p class="text-emerald-700 font-bold">Correct Answer: ${correctAnsText}</p>` : ''}
-                    </div>
-                    <div class="bg-white/80 p-2.5 rounded-xl border border-slate-200 text-xs text-slate-600 font-semibold">
-                        <i class="fa-solid fa-circle-info text-peppaBlue mr-1"></i> <strong>Explanation:</strong> ${q.explanation}
-                    </div>
-                `;
-
-                container.appendChild(card);
-            });
-        }
-
-        function getTeacherData() {
-            const stored = localStorage.getItem('peppa_quiz_results');
-            return stored ? JSON.parse(stored) : [];
-        }
-
-        function saveResultToTeacherData(record) {
-            const data = getTeacherData();
-            data.unshift(record);
-            localStorage.setItem('peppa_quiz_results', JSON.stringify(data));
-        }
-
-        function clearAllScores() {
-            if (confirm("Delete all student test logs?")) {
-                localStorage.removeItem('peppa_quiz_results');
-                renderTeacherTable();
-            }
-        }
-
-        function renderTeacherTable() {
-            const tbody = document.getElementById('teacher-score-tbody');
-            const searchVal = document.getElementById('teacher-search').value.toLowerCase();
-            const data = getTeacherData();
-
-            tbody.innerHTML = '';
-            const filtered = data.filter(item => item.name.toLowerCase().includes(searchVal));
-
-            if (filtered.length === 0) {
-                tbody.innerHTML = `
-                    <tr>
-                        <td colspan="6" class="p-8 text-center text-slate-400 font-semibold">
-                            No submissions recorded yet.
-                        </td>
-                    </tr>
-                `;
-                return;
-            }
-
-            filtered.forEach(item => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
-                
-                let scoreColor = item.score >= 80 ? 'text-emerald-600' : (item.score >= 60 ? 'text-amber-600' : 'text-rose-600');
-
-                tr.innerHTML = `
-                    <td class="p-3.5 font-bold text-slate-800">${item.name}</td>
-                    <td class="p-3.5 text-slate-600">${item.grade}</td>
-                    <td class="p-3.5 font-bold ${scoreColor}">${item.score} / 100</td>
-                    <td class="p-3.5 text-slate-600">${item.correct}/${item.total} (${item.score}%)</td>
-                    <td class="p-3.5 text-slate-600">${item.duration}</td>
-                    <td class="p-3.5 text-slate-400 text-xs">${item.timestamp}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function alertModal(msg) {
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4";
-            modal.innerHTML = `
-                <div class="bg-white custom-card p-6 max-w-sm w-full text-center space-y-4">
-                    <div class="w-12 h-12 rounded-full bg-peppaBgPink text-peppaPink flex items-center justify-center text-xl mx-auto font-bold">
-                        🐷
-                    </div>
-                    <p class="font-bold text-slate-800 text-base">${msg}</p>
-                    <button onclick="this.closest('.fixed').remove()" class="px-6 py-2 bg-peppaPink text-white font-bold rounded-xl text-sm shadow">
-                        OK
-                    </button>
-                </div>
+        tableBody.innerHTML = '';
+        if (data) {
+          Object.keys(data).reverse().forEach((key) => {
+            const item = data[key];
+            tableBody.innerHTML += `
+              <tr class="border-b hover:bg-yellow-50">
+                <td class="p-3 text-slate-600">${item.date || '-'}</td>
+                <td class="p-3 font-bold text-slate-800">${item.name}</td>
+                <td class="p-3"><span class="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-full font-bold">${item.score} / 100</span></td>
+                <td class="p-3 text-emerald-600 font-semibold"><i class="fa-solid fa-check-circle"></i> Submitted</td>
+              </tr>
             `;
-            document.body.appendChild(modal);
+          });
+        } else {
+          tableBody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-slate-400">No student submissions yet.</td></tr>`;
         }
-    </script>
+      });
+    }
+
+    // Initialize Listener
+    document.addEventListener('DOMContentLoaded', listenForRealtimeScores);
+  </script>
 </body>
 </html>
