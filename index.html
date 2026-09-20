@@ -783,49 +783,112 @@
             });
         }
 
-        // Sinkronisasi Realtime Firebase untuk Guru
-        function listenToRealtimeScores() {
-            const tbody = document.getElementById('teacher-score-tbody');
-            
-            database.ref('submissions').orderByChild('timestamp').on('value', (snapshot) => {
-                tbody.innerHTML = '';
-                
-                if (!snapshot.exists()) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="p-8 text-center text-slate-400 font-semibold">
-                                No student submissions yet.
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
+    
+       // 1. Fungsi Menghitung Skor & Mengirim Data ke Firebase
+function calculateAndShowScore() {
+    clearInterval(timerInterval);
 
-                const list = [];
-                snapshot.forEach((child) => {
-                    list.unshift(child.val());
-                });
+    let correctCount = 0;
+    quizQuestions.forEach(q => {
+        if (userAnswers[q.id] === q.answer) {
+            correctCount++;
+        }
+    });
 
-                list.forEach((item) => {
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-amber-50/50 transition border-b border-amber-100";
+    const total = quizQuestions.length;
+    const scorePercentage = Math.round((correctCount / total) * 100);
+    const wrongCount = total - correctCount;
 
-                    tr.innerHTML = `
-                        <td class="p-3.5 text-slate-600">${item.date || '-'}</td>
-                        <td class="p-3.5 font-bold text-slate-800">${item.studentName}</td>
-                        <td class="p-3.5 text-slate-600">${item.examTitle || 'Peppa Pig English Quiz'}</td>
-                        <td class="p-3.5 font-bold text-peppaPink">${item.score}%</td>
-                        <td class="p-3.5">
-                            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
-                                ${item.status || 'Completed'}
-                            </span>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            });
+    const mins = String(Math.floor(timerSeconds / 60)).padStart(2, '0');
+    const secs = String(timerSeconds % 60).padStart(2, '0');
+    const durationStr = `${mins}:${secs}`;
+
+    document.getElementById('result-student-info').innerText = `${currentStudent.name} • ${currentStudent.grade}`;
+    document.getElementById('final-score-val').innerText = scorePercentage;
+    document.getElementById('final-score-percentage').innerText = `${correctCount} out of ${total} Correct (${scorePercentage}%)`;
+
+    document.getElementById('stat-correct').innerText = correctCount;
+    document.getElementById('stat-wrong').innerText = wrongCount;
+    document.getElementById('stat-time').innerText = durationStr;
+
+    // Format Tanggal
+    const now = new Date();
+    const dateStr = `${now.getMonth() + 1}/${now.getDate()}/${now.getFullYear()}`;
+    
+    const payload = {
+        studentName: currentStudent.name,
+        examTitle: "Peppa Pig English Quiz",
+        score: scorePercentage,
+        status: "Completed",
+        date: dateStr,
+        timestamp: firebase.database.ServerValue.TIMESTAMP
+    };
+
+    // Kirim ke Firebase dengan callback penanganan error
+    database.ref('submissions').push(payload, (error) => {
+        if (error) {
+            console.error("Gagal menyimpan ke Firebase:", error);
+            alertModal("Gagal mengirim hasil ke server. Pastikan Firebase Rules diset ke 'true'.");
+        } else {
+            console.log("Data berhasil terkirim ke Firebase!");
+        }
+    });
+
+    renderReviewBreakdown();
+    switchView('result');
+}
+
+// 2. Fungsi Sinkronisasi Realtime untuk Dashboard Guru (Bagian di foto Anda)
+function listenToRealtimeScores() {
+    const tbody = document.getElementById('teacher-score-tbody');
+    
+    database.ref('submissions').on('value', (snapshot) => {
+        tbody.innerHTML = '';
+        
+        if (!snapshot.exists()) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="p-8 text-center text-slate-400 font-semibold">
+                        Belum ada data kuis yang masuk dari murid.
+                    </td>
+                </tr>
+            `;
+            return;
         }
 
+        const list = [];
+        snapshot.forEach((child) => {
+            list.unshift({ key: child.key, ...child.val() });
+        });
+
+        list.forEach((item) => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-amber-50/50 transition border-b border-amber-100";
+
+            tr.innerHTML = `
+                <td class="p-3.5 text-slate-600">${item.date || '-'}</td>
+                <td class="p-3.5 font-bold text-slate-800">${item.studentName || 'Anonim'}</td>
+                <td class="p-3.5 text-slate-600">${item.examTitle || 'Peppa Pig English Quiz'}</td>
+                <td class="p-3.5 font-bold text-peppaPink">${item.score}%</td>
+                <td class="p-3.5">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                        ${item.status || 'Completed'}
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }, (error) => {
+        console.error("Firebase Read Error:", error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="p-8 text-center text-rose-500 font-bold">
+                    Akses ditolak oleh Firebase. Silakan periksa tab Rules di Firebase Console.
+                </td>
+            </tr>
+        `;
+    });
+}
         // Tombol Reset Data untuk Teacher
         function resetTeacherData() {
             if (confirm("Are you sure you want to clear all student submissions from the server?")) {
