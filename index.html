@@ -571,7 +571,9 @@
 
             currentStudent.name = nameInput;
             currentStudent.grade = classInput;
-            document.getElementById('display-student-name').innerText = `${currentStudent.name} (${currentStudent.grade})`;
+            document.getElementById('display-student-name').innerText = currentStudent.grade?
+            `${currentStudent.name} (${currentStudent.grade})` 
+            : currentStudent.name;
 
             userAnswers = {};
             timerSeconds = 0;
